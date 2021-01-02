@@ -1,0 +1,43 @@
+package com.formacionbdispringboot.app.item.service;
+
+import java.util.List; 
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
+import com.formacionbdispringboot.app.commons.models.entity.productos.Producto;
+import com.formacionbdispringboot.app.item.clientes.ProductoClienteRest;
+import com.formacionbdispringboot.app.item.models.Item; @Service
+@Primary // al haber dos implementaciones tirando de la misma interfaz se escoge esta con esta anotacion
+public class ItemServiceFeign implements ItemService {
+	
+	@Autowired //llamamos al cliente configurado en 
+	private ProductoClienteRest productoClienteRest;
+
+	@Override
+	public List<Item> findAll() {
+		return productoClienteRest.listar().stream().map(p->new Item(p,1)).collect(Collectors.toList());
+	}
+
+	@Override
+	public Item findById(Long id, Integer cantidad) {
+		return new Item(productoClienteRest.detalle(id), cantidad);
+	}
+
+	@Override
+	public Producto save(Producto producto) {
+		return productoClienteRest.crear(producto);
+	}
+
+	@Override
+	public Producto update(Producto producto, Long id) {
+		return productoClienteRest.update(producto, id);
+	}
+
+	@Override
+	public void delete(Long id) {
+	}
+
+}
